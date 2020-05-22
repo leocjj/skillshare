@@ -1,6 +1,8 @@
 var AWS = require('aws-sdk');
 const utf8 = require('utf8');
 
+AWS.config.update({region: 'us-east-1'});
+
 var s3 = new AWS.S3();
 
 // Los nombres de buckets deben ser únicos entre todos los usuarios de S3
@@ -24,5 +26,10 @@ s3.getObject({Bucket: myBucket, Key: myKey,ResponseContentType:'application/json
            string += String.fromCharCode(ds3JSON.Body.data[i]);
        }
        console.log(string);
+       var translate = new AWS.Translate({apiVersion: '2017-07-01'});
+       translate.translateText({SourceLanguageCode:'en',TargetLanguageCode:'es',Text:string}, function(err,data){
+          if (err) console.log(err,err.stack);
+          else console.log(data);
+      });
     }
 });
