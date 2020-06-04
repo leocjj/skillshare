@@ -68,8 +68,12 @@ Object URL		https://skillshare-terraform-state-017784105438.s3.amazonaws.com/us-
 https://aveecukepl.execute-api.us-east-1.amazonaws.com/default/test10
 
 
+https://www.postman.com/
 
 
+https://transcriptions-translations.s3.amazonaws.com/indexTest.html
+https://rlv4ft76fg.execute-api.us-east-1.amazonaws.com/translatefunction_dev/?TargetLang=es&Bucket=transcriptions-translations&Bucketkey=formats/Roman+Muradov+01+Intro+V4.srt
+https://rlv4ft76fg.execute-api.us-east-1.amazonaws.com/translatefunction_dev/?TargetLang=es&Bucket=transcriptions-translations&Bucketkey=formats/video1t.srt
 
 
 
