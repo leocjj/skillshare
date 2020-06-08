@@ -9,8 +9,8 @@ Resources:
       Runtime: python3.7
       CodeUri: .
       Description: ''
-      MemorySize: 128
-      Timeout: 3
+      MemorySize: 3008
+      Timeout: 63
       Role: 'arn:aws:iam::017784105438:role/lambda-role'
       Events:
         Api1:

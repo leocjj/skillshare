@@ -76,6 +76,9 @@ https://rlv4ft76fg.execute-api.us-east-1.amazonaws.com/translatefunction_dev/?Ta
 https://rlv4ft76fg.execute-api.us-east-1.amazonaws.com/translatefunction_dev/?TargetLang=es&Bucket=transcriptions-translations&Bucketkey=formats/video1t.srt
 
 
+https://verbit-ai.zendesk.com/hc/en-us/articles/360021315611-Verbit-Platform-API-v3
+https://docs.aws.amazon.com/codepipeline/latest/userguide/tutorials-cloudformation.html
+https://aws.amazon.com/codepipeline/
 
 
 
