@@ -21,7 +21,7 @@ event['queryStringParameters']['Bucketkey']: AWS key of S3 object (file) with tr
 
 ### Functionalities
 
-Coding notes:
+#### Coding notes:
 1) If the source language is the same target language, a JSON is also stored
     using the original transcription text.
 2) AWS translate_text() allows 5000 bytes per request, so original
@@ -67,7 +67,7 @@ resp = {    'statusCode': 200,
 ## Examples
 
 ```
-example code
+...
 ```
 
 ## Built With
