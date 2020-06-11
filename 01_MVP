@@ -1,0 +1,5 @@
+MVP
+https://transcriptions-translations.s3.amazonaws.com/index.html
+
+API endpoint
+https://ytuln8zsz1.execute-api.us-east-1.amazonaws.com/translatetext?TargetLang=es&Bucketkey=formats/video1t.srt
