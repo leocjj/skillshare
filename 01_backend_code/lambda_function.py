@@ -1,5 +1,6 @@
-import json
-import boto3
+from boto3 import client
+from json import dumps
+from os import environ
 
 '''    
 Coding notes:
@@ -7,7 +8,11 @@ Coding notes:
     using the original transcription text.
 2) AWS translate_text() allows 5000 bytes per request, so original
     transcription must be split in case its size is bigger.
-3) Functionalities:
+    https://docs.aws.amazon.com/translate/latest/dg/what-is-limits.html
+3) Best practices for working with AWS Lambda functions
+        https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html
+4) Lambda, API Gateway and Bucket must be in the same server.
+4) Functionalities:
     *) Detects if transcription (key) exists in Bucket. If not, returns 400
     *) Returns translations already stored to improve efficiency
     *) If no translation found, automatically detects transcription language.
@@ -22,7 +27,33 @@ Coding notes:
         4990 for Unicode-8 general languages, but for very special characters
         languages, step must be as low as 600.
     *) Returns 500 in case any error occurs during the translate/store task.
+
+https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#S3.Client.head_object
+https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#S3.Client.get_object
+https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/translate.html
+https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/translate.html#Translate.Client.start_text_translation_job
+https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/comprehend.html
 '''
+
+s3Client = client('s3')
+comprehendClient = client('comprehend')
+translateClient = client('translate')
+
+# bucket declared as environmental variable.
+bucket = environ['bucket']
+# 5000, maximum of bytes for AWS translate_text, step=4990 for unicode-8 sources
+step = 4990
+# Threshold to accept an identified language match [0...1]
+languageThreshold = 0.6
+# Response dictionary
+resp = {    'statusCode': 200,
+            'headers': {'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*',
+                        'targetKey': ''
+                        },
+            'body': dumps([])
+        }
+# languagesList = ["af","am","ar","as","az","ba","be","bn","bs","bg","ca","ceb","cs","cv","cy","da","de","el","en","eo","et","eu","fa","fi","fr","gd","ga","gl","gu","ht","he","hi","hr","hu","hy","ilo","id","is","it","jv","ja","kn","ka","kk","km","ky","ko","ku","la","lv","lt","lb","ml","mr","mk","mg","mn","ms","my","ne","new","nl","no","or","pa","pl","pt","ps","qu","ro","ru","sa","si","sk","sl","sd","so","es","sq","sr","su","sw","sv","ta","tt","te","tg","tl","th","tk","tr","ug","uk","ur","uz","vi","yi","yo","zh","zh-TW"]
 
 
 def lambda_handler(event, context):
@@ -30,110 +61,120 @@ def lambda_handler(event, context):
     This function is called from an API Gateway (translate-API), receive three
     parameters inside an array to get a translation.
     event: array to receive parameters from API
-    event['queryStringParameters']['TargetLang']:
-        Target language for translate
-    event['queryStringParameters']['Bucket']:
-        AWS Bucket (folder) to find transcription S3,
-        MUST BE IN THE SAME LAMBDA SERVER
-    event['queryStringParameters']['Bucketkey']:
-        AWS key of S3 object (file) with transcription text
+    event['queryStringParameters']['TargetLang']: Target language for translate
+    event['queryStringParameters']['Bucketkey']: s3 key object with transcription
     '''
-    target_lang = event['queryStringParameters']['TargetLang']
-    bucket = event['queryStringParameters']['Bucket']
     key = event['queryStringParameters']['Bucketkey']
-    targetkey = key[:key.rfind('.')] + '_' + target_lang + '.srt'
+    targetLang = event['queryStringParameters']['TargetLang']
+    return lambdaFunction(key, targetLang)
 
-    ''' Resonse dictionary '''
-    resp = {    'statusCode': 200,
-                'headers': {'Content-Type': 'application/json',
-                            'Access-Control-Allow-Origin': '*',
-                            'targetKey': targetkey
-                            },
-                            'body': json.dumps([])
-            }
 
-    try:
-        ''' TRY TO FIND ORIGINAL TRANSCRIPTION STORED IN S3 '''
-        s3 = boto3.client('s3')
-        s3.head_object(Bucket=bucket, Key=key)
-    except Exception as e:
-        resp['statusCode'] = 400
-        resp['body'] = json.dumps('Video transcription not found')
+def lambdaFunction(key, targetLang):
+    resp['headers']['targetKey'] = key[:key.rfind('.')] + '_' + targetLang + '.srt'
+
+
+    ''' IF ORIGINAL TRANSCRIPTION STORED IN S3 IS NOT FOUND, RETURN 40X '''
+    if not keyExist(key):
+        resp['body'] = dumps('Video transcription not found')
         return resp
 
-    try:
-        '''GETS ALREADY STORED TRANSLATION, IF NOT, TRANSLATE TRANSCRIPTION'''
-        # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#S3.Client.get_object
+    '''GET STORED TRANSLATION, IF NOT, TRANSLATE TRANSCRIPTION AND STORE IT'''
+    if keyExist(resp['headers']['targetKey']):
+        translationFile = s3Client.get_object(Bucket=bucket, Key=resp['headers']['targetKey'])
+        resp['body'] = translationFile['Body'].read().decode("utf-8")
+        resp['statusCode'] = 200  # Ok
+        return resp
+    else:
+        # To get S3 object with original transcription
+        response = s3Client.get_object(Bucket=bucket, Key=key)
+        text = str(response['Body'].read().decode('utf-8'))
+    
+        # Detect source language by sending first 100 characters to check
+        responseLanguage = comprehendClient.detect_dominant_language(Text=text[:100])
+        if responseLanguage['Languages'][0]['Score'] <= languageThreshold:
+            resp['statusCode'] = 412    # Precondition Failed
+            resp['body'] = dumps('Video language not soported')
+            return resp
+        sourceLang = responseLanguage['Languages'][0]['LanguageCode']
 
+        # Translate text if target language is not the source languaje
+        if targetLang != sourceLang:
+            text = translateBatches(sourceLang, targetLang, text)
+        if not text:
+            resp['body'] = dumps('Translation was not possible')
+            return resp
+    
+        # Convert translated text into a list of dictionaries for every sentense
+        listTranslated = []
+        for i in text.split('\n\n'):
+            phrase = i.split('\n')
+            listTranslated.append({ 'index': phrase[0],
+                                    'start': phrase[1][:8],
+                                    'content': phrase[2]
+                                })
+        
+        ########## ALWAYS ACTIVATE THIS IN PRODUCTION ##########
+        ##### Store translation in a S3 object for future requests #####
+        s3Client.put_object(    Bucket = bucket,
+                                Key = resp['headers']['targetKey'],
+                                Body = dumps(listTranslated),
+                                Metadata = {'lang':targetLang,
+                                            'src_trscpt_file':key
+                                            }
+                            )
+    
+        resp['statusCode'] = 200    # Ok
+        resp['body'] = dumps(listTranslated)
+        return resp
+
+
+def translateBatches(sourceLang, targetLang, text):
+    ''' Translate text in batches of step size but with cutting rows of file '''
+    lenn = len(text)
+    if lenn <= step:
         try:
-            '''TRY TO FIND IF TRANSLATION IS ALREADY DONE AND STORED IN S3 '''
-            s3 = boto3.client('s3')
-            s3.head_object(Bucket=bucket, Key=targetkey)
-            translation_file = s3.get_object(Bucket=bucket, Key=targetkey)
-            resp['body'] = translation_file['Body'].read().decode("utf-8")
-            return resp
-            
-        except Exception as e:
-            ''' IF TRANSLATION DOSN'T EXIST, TRANSLATE IT AND STORE IT IN S3'''
-
-            # To get S3 object with original transcrtion
-            response = s3.get_object(Bucket=bucket, Key=key)
-            text = str(response['Body'].read().decode('utf-8'))
-
-            # Detect source language by sending first 100 characters to check
-            # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/comprehend.html
-            source_lang = "auto"
+            translatedText = translateClient.translate_text(Text=text, SourceLanguageCode=sourceLang, TargetLanguageCode=targetLang)
+        except translateClient.exceptions.ClientError as e:
+            if e.response['Error']['Code'] == "500":
+                resp['statusCode'] = 500   # Internal error
+            return None
+        return translatedText.get('TranslatedText')
+    else:
+        srtTemp = ''
+        indexLow = 0
+        indexHigh = text.rfind('\n\n', 0, step)
+        while(indexHigh < lenn and indexHigh != -1):
             try:
-                client = boto3.client('comprehend')
-                responseLanguage = client.detect_dominant_language(Text=text[:100])
-                source_lang = responseLanguage['Languages'][0]['LanguageCode']
-            except Exception as e:
-                resp['statusCode'] = 400
-                resp['body'] = json.dumps('Video language not soported')
-                return resp
+                translatedText = translateClient.translate_text(Text=text[indexLow:indexHigh], SourceLanguageCode=sourceLang, TargetLanguageCode=targetLang)
+            except translateClient.exceptions.ClientError as e:
+                if e.response['Error']['Code'] == "500":
+                    resp['statusCode'] = 500   # Internal error
+                return None
+            srtTemp += translatedText.get('TranslatedText') + '\n\n'
+            indexLow = indexHigh + 2
+            indexHigh = text.rfind('\n\n', indexLow , indexLow + step)
+        try:
+            translatedText = translateClient.translate_text(Text=text[indexLow:lenn], SourceLanguageCode=sourceLang, TargetLanguageCode=targetLang)
+        except translateClient.exceptions.ClientError as e:
+            if e.response['Error']['Code'] == "500":
+                resp['statusCode'] = 500   # Internal error
+            return None
+        srtTemp += translatedText.get('TranslatedText')
+        return srtTemp
 
-            # Translate text if target language is not the source languaje
-            if target_lang != source_lang:
-                lenn = len(text)
-                # 5000 is the maximum of bytes for AWS translate_text.
-                # step can be 4990 for unicode-8 languages, or 600 for all.
-                step = 4990
-                translate_client = boto3.client('translate')
-                if lenn <= step:
-                    translated_text = translate_client.translate_text(Text=text, SourceLanguageCode=source_lang, TargetLanguageCode=target_lang)
-                    text = translated_text.get('TranslatedText')
-                else:
-                    srtTemp = ''
-                    indexLow = 0
-                    indexHigh = text.rfind('\n\n', 0, step)
-                    while(indexHigh < lenn and indexHigh != -1):
-                        translated_text = translate_client.translate_text(Text=text[indexLow:indexHigh], SourceLanguageCode=source_lang, TargetLanguageCode=target_lang)
-                        srtTemp += translated_text.get('TranslatedText') + '\n\n'
-                        indexLow = indexHigh + 2
-                        indexHigh = text.rfind('\n\n', indexLow , indexLow + step)
-                    translated_text = translate_client.translate_text(Text=text[indexLow:lenn], SourceLanguageCode=source_lang, TargetLanguageCode=target_lang)
-                    srtTemp += translated_text.get('TranslatedText')
-                    text = srtTemp
 
-            # JSON conversion
-            srt_list_translated = []
-            for i in text.split('\n\n'):
-                phrase = i.split('\n')
-                srt_list_translated.append({    'index': phrase[0],
-                                                'start': phrase[1][:8],
-                                                'content': phrase[2]
-                                            })
-            
-            ########## ALWAYS ACTIVATE THIS IN PRODUCTION ##########
-            ##### Store translation in a S3 object for future requests #####
-            s3.put_object(  Bucket=bucket, Key=targetkey,
-                            Body=json.dumps(srt_list_translated),
-                            Metadata={'lang':target_lang,'src_trscpt_file':key})
-
-            resp['body'] = json.dumps(srt_list_translated)
-            return resp
-            
-    except Exception as e:
-        resp['statusCode'] = 500
-        resp['body'] = json.dumps('An error occurred while translations was in process, please try again later')
-        return resp
+def keyExist(s3Key):
+    ''' TRY TO FIND IF S3 KEY EXIST '''
+    try:
+        s3Client.head_object(Bucket=bucket, Key=s3Key)
+    except s3Client.exceptions.ClientError as e:
+        if e.response['Error']['Code'] == "404":
+            resp['statusCode'] = 404   # Not found
+        return False
+    # except Exception as ee:
+    #    return False
+    else:
+        return True
+    #finally:
+    #    resp['statusCode'] = 400  # Bad request
+    #    return False
