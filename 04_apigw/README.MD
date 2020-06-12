@@ -5,7 +5,7 @@ API that takes a transcript file in srt format and translates it into a target l
 
 ## Consumes
 
-invoke api gateway like this URL: [translatetext] (ytuln8zsz1.execute-api.us-east-1.amazonaws.com/translatetext)
+invoke api gateway like this URL: [translatetext](ytuln8zsz1.execute-api.us-east-1.amazonaws.com/translatetext)
 
 ## Produced
 
@@ -22,7 +22,30 @@ The root resource with the default path specification.
 Path: /
 Method: GET
 
-Gets a JSON format translated into a target language, for an SRT file of a source language transcript\nJSON format:\n\tindex: integer,\n\tstart: hh: mm: ss, ms -> hh: mm: ss, ms,\n\t content: Text Translated
+Gets a JSON format translated into a target language, for an SRT file of a source language transcript JSON format: 
+"index": "integer",
+"start": "hh: mm: ss, ms -> hh: mm: ss, ms",
+"content": "Text Translated"
+
+JSON Example:
+
+	[
+	    {
+	        "index": "1",
+	        "start": "00:00:00",
+	        "content": "Creo que como artistas,"
+	    },
+	    {
+	        "index": "2",
+	        "start": "00:00:01",
+	        "content": "no tenemos que casillarnos y elegir ser una cosa u otra."
+	    },
+	    {
+	        "index": "3",
+	        "start": "00:00:11",
+	        "content": "Hola, mi nombre es Roman Muradov."
+	    }
+	]
 
 ## Query String Parameters:
 
@@ -72,7 +95,7 @@ status 500: An error occurred executing the aws Translate service:
 
 To run a test at the following link:
 
-[test api gateway] (https://app.swaggerhub.com/apis/ilasso/translate-api/1.3)
+[test api gateway](https://app.swaggerhub.com/apis/ilasso/translate-api/1.3)
 
 ## Documentantion Files:
 
