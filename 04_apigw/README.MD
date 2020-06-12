@@ -23,9 +23,14 @@ Path: /
 Method: GET
 
 Gets a JSON format translated into a target language, for an SRT file of a source language transcript JSON format: 
-"index": "integer",
-"start": "hh: mm: ss, ms -> hh: mm: ss, ms",
-"content": "Text Translated"
+
+	[ 
+		{
+			"index": "integer",
+			"start": "hh: mm: ss, ms -> hh: mm: ss, ms",
+			"content": "Text Translated"
+		}
+	]
 
 JSON Example:
 
