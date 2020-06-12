@@ -5,7 +5,7 @@ API that takes a transcript file in srt format and translates it into a target l
 
 ## Consumes
 
-ytuln8zsz1.execute-api.us-east-1.amazonaws.com/translatetext
+invoke api gateway like this URL: [translatetext] (ytuln8zsz1.execute-api.us-east-1.amazonaws.com/translatetext)
 
 ## Produced
 
@@ -68,22 +68,42 @@ status 500: An error occurred executing the aws Translate service:
 	[body] : An error occurred executing the aws Translate service
 	[targetKey] translated s3 resource name
 
+## Swagger
+
+To run a test at the following link:
+
+[test api gateway] (https://app.swaggerhub.com/apis/ilasso/translate-api/1.3)
+
+## Documentantion Files:
 
 Files corresponding to export of the documentation made in the aws console like this:
 
+contains json and yaml files for swagger and openAPI3
+
 Export as openAPI3:
-translate-API-translatetext-oas30-apigateway.json
-translate-API-translatetext-oas30-apigateway.yaml
-translate-API-translatetext-oas30.json
-translate-API-translatetext-oas30-postman.json
-translate-API-translatetext-oas30-postman.yaml
-translate-API-translatetext-oas30.yaml
+
+	To Postman:
+	require "translate-API-translatetext-oas30-postman.json"
+	translate-API-translatetext-oas30-postman.yaml
+
+	To Swagger:
+	translate-API-translatetext-oas30.json
+	translate-API-translatetext-oas30.yaml
+
+	To aws apigateway:
+	translate-API-translatetext-oas30-apigateway.json
+	translate-API-translatetext-oas30-apigateway.yaml
 
 Export as swagger:
 
-translate-API-translatetext-swagger-apigateway.json
-translate-API-translatetext-swagger-apigateway.yaml
-translate-API-translatetext-swagger.json
-translate-API-translatetext-swagger-postman.json
-translate-API-translatetext-swagger.yaml
-translate-API-translatetext-swagger-postman.yaml
+	To Postman:
+	translate-API-translatetext-swagger-postman.json
+	translate-API-translatetext-swagger-postman.yaml
+
+	To Swagger:
+	translate-API-translatetext-swagger.json
+	translate-API-translatetext-swagger.yaml
+
+	To aws apigateway:
+	translate-API-translatetext-swagger-apigateway.json
+	translate-API-translatetext-swagger-apigateway.yaml
