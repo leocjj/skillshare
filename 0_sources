@@ -84,10 +84,18 @@ https://docs.aws.amazon.com/codepipeline/latest/userguide/tutorials-cloudformati
 https://aws.amazon.com/codepipeline/
 
 
+https://rlv4ft76fg.execute-api.us-east-1.amazonaws.com/translatefunction/
+https://ytuln8zsz1.execute-api.us-east-1.amazonaws.com/translatetext?TargetLang=es&Bucketkey=formats/video1t.srt
+
+https://app.swaggerhub.com/apis/ilasso/translate-api/1.3#/info
 
 
 
+Landing page:
+https://transcriptions-translations.s3.amazonaws.com/landing/index.html
 
+MVP:
+https://transcriptions-translations.s3.amazonaws.com/index.html
 
 
 
