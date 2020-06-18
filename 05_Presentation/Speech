@@ -1,0 +1,61 @@
+
+
+Slide 1:
+
+	Good afternoon everyone,
+	We are going to present you the project
+		AUTOMATIC TRANSLATION
+			made to Skillshare
+
+	Skillshare is an American online learning community
+	to learn from educational videos.
+	The courses focus on learning by completing a project.
+
+Slide 2:
+
+	Skillshare needs to go beyond English spoken users
+	but videos and transcriptions of this are in English
+
+	they want to extend its target
+	so they need online transcriptions for video transcriptions
+	
+	and this process needs to be automatic 
+	without affecting user experience.
+
+Slide 3:
+
+	VIDEO RUNS AUTOMATICALLY
+
+	Our solutions bring what they need right now.
+	In this MVP you can see how a video is shown with a transcription in English, then the user can select his or her native language and easily can follow the lesson by reading translated transcription online.
+
+	The first time a user selects a language for a specific video, translation occurs and is stored for future users.
+
+	This way the resources used are minimum and the process is automatic, without the need of somebody who runs a translation process each time a new video arrives.
+
+Slide 4:
+
+	This is our team...
+	Carlos in frontend and design
+	Ivan in frontend and testing
+	And myself in the backend
+
+Slide 5:
+
+	The architecture for this service uses AWS services including:
+		API Gateway
+		Lambda funcion coded in Python
+		S3 objects
+		Translate
+		Comprehend to determin the source language
+
+
+
+
+
+
+
+
+
+
+
