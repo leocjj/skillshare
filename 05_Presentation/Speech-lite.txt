@@ -1,0 +1,159 @@
+TOMAR REFRIGERIO
+CAMISA, AFEITARME
+TOMAR VITAMINAS
+TOMAR GOTAS
+
+imprimir guión
+
+
+Ir al baño
+Tomar miel
+Tener vaso de agua (lejos)
+Silencio, espacio, internet
+
+Tener guión impreso, tres copias.
+
+Presentación:
+	Desplazar toda, probar pantalla completa.
+
+	Dejar presentación al inicio
+	probar pantalla completa, cerrar
+
+Zoom
+	abrir zoom oficial
+	
+TURNO
+	COLOCAR CÁMARA	Y MICRÓFONO
+
+Slide 1:
+	Good afternoon,
+	Thanks everyone for being here.
+	Now, we are going to present to you
+	the project AUTOMATIC TRANSLATION
+	made for Skillshare.
+
+	Skillshare is an American online learning community
+	to learn from educational videos.
+
+Slide 2:
+
+	Skillshare needs to go beyond English spoken usersA
+	but videos and transcriptions are in English.
+
+	They want to extend its target.
+	They need online translations for their video transcriptions.
+	
+	And this process needs to be automatic 
+	without affecting user experience.
+
+	what we did was to bring an automatic service
+	to translate the transcription of a video the user is viewing.
+
+
+Slide 3:
+
+	VIDEO RUNS AUTOMATICALLY
+
+	Our solution brings what they need right now.
+	In this MVP you can see how a video is shown
+	with a transcription in English,
+	then the user can select his or her native language
+	and easily can follow the lesson
+	by reading translated transcription online.
+
+	The first time a user selects a language for a specific video,
+	translation occurs and is stored for future users.
+
+	This way the resources used are minimum
+	and the process is automatic,
+	without the need of somebody who runs a translation process
+	each time a new video arrives.
+
+
+Slide 4:	TEAM
+
+	This is our team... Zombieland CLI
+	Carlos in frontend and design
+	Ivan in frontend and testing
+	And myself, Leonardo in the backend
+
+
+Slide 5:	ARCHITECTURE
+
+	The architecture for this PROJECT uses AWS services
+	specially
+		A.P.I. Gateway
+		Lambda function using Python
+
+
+Slide 6:	API
+
+	The A.P.I was an A.P.I Rest,
+	we used a get method to make the request
+	and then the A.P.I calls for the lambda function
+
+Slide 7:	lambda
+	
+	The lambda function we created
+		detects the video language
+		to see if the translation requested is already stored
+		and if not,
+		calls a translate_text method
+
+Slide 8: 	PROJECT
+
+	Our project was scrum-based...
+	We had weekly sprints,
+	A daily meeting,
+	and Sprint review on Fridays
+
+	In addition we had Mandatory rules for the team
+	and our timeline was of six weeks.
+
+Slide 9:	CHALLENGE
+
+	Our main challenge was achitecture definition
+	
+	This was because we had several options,
+	and to select the optimal one we had to investigate technical details
+	about how Skillshare is working right now.
+
+Slide 10: 	LESSONS
+
+	There was a lot of learning lessons for the team,
+	
+	However we want to say for sure than now we feel
+	we are capable to learn what we need.
+
+Slide 11:	PAGES
+
+	Finnaly, I want to show you our landing page for the project.
+
+	OPEN LANDING PAGE
+
+	Here you will find...
+
+
+Slide 12
+
+	Thank you
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
