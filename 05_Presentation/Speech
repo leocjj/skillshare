@@ -85,36 +85,43 @@ Slide 3:
 
 	VIDEO RUNS AUTOMATICALLY
 
-	Our solutions bring what they need right now.
+	Our solution brings what they need right now.
 	In this MVP you can see how a video is shown with a transcription in English, then the user can select his or her native language and easily can follow the lesson by reading translated transcription online.
 
 	The first time a user selects a language for a specific video, translation occurs and is stored for future users.
 
 	This way the resources used are minimum and the process is automatic, without the need of somebody who runs a translation process each time a new video arrives.
 
-Slide 4:
 
-	This is our team...
+Slide 4:	TEAM
+
+	This is our team... Zombieland CLI
 	Carlos in frontend and design
 	Ivan in frontend and testing
-	And myself in the backend
+	And myself, Leonardo in the backend
 
-Slide 5:
 
-	The architecture for this service uses AWS services including:
-		API Gateway
-		Lambda funcion coded in Python
+Slide 5:	ARCHITECTURE
+
+	The architecture for this PROJECT uses AWS services including
+		A.P.I. Gateway
+		Lambda function using Python
 		S3 objects
 		Translate
-		Comprehend to determin the source language
+		AND
+		Comprehend to determine the source language
+
+
+Slide 6:	API
+
+	The A.P.I was an A.P.I Rest,
+	we used a get method to make the request
+	and then the A.P.I calls for the lambda function
+
+Slide 7:	lambda
 
 
 
-
-	Good afternoon everyone, first I want to say thanks...
-	Thanks a lot to Holberton School for this opportunity
-	Thank you Silvia, Laura, Jhoana and Andrés Rojas for the support
-	Thank you Andrés Barreto for helping to bring Holberton to Colombia.
 
 
 Slide 12
