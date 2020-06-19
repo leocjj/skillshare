@@ -56,34 +56,30 @@ Zoom
 TURNO
 	COLOCAR CÁMARA	
 	Cuando me den el turno, dar las gracias:
-		a Holberton
-		a Silvia
-		a Laura
-		a Jhoana
 
 Slide 1:
 
-	Good afternoon everyone,
-	We are going to present you the project
-		AUTOMATIC TRANSLATION
-			made to Skillshare
+	Now, we are going to present to you the project AUTOMATIC TRANSLATION made for Skillshare.
 
 	Skillshare is an American online learning community
 	to learn from educational videos.
-	The courses focus on learning by completing a project.
+	The courses focus on learning by completing projects,
+	And they have a special need, to expand their target market.
 
 Slide 2:
 
 	Skillshare needs to go beyond English spoken users
-	but videos and transcriptions of this are in English
+	but videos and transcriptions are in English
 
 	they want to extend its target
-	so they need online transcriptions for video transcriptions
+	they need online translations for their video transcriptions
 	
 	and this process needs to be automatic 
 	without affecting user experience.
 
-	what we did...
+	what we did was to bring an automatic service
+	to translate the transcriptions of a video the user is viewing.
+
 
 Slide 3:
 
@@ -113,6 +109,12 @@ Slide 5:
 		Comprehend to determin the source language
 
 
+
+
+	Good afternoon everyone, first I want to say thanks...
+	Thanks a lot to Holberton School for this opportunity
+	Thank you Silvia, Laura, Jhoana and Andrés Rojas for the support
+	Thank you Andrés Barreto for helping to bring Holberton to Colombia.
 
 
 Slide 12
