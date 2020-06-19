@@ -119,13 +119,76 @@ Slide 6:	API
 	and then the A.P.I calls for the lambda function
 
 Slide 7:	lambda
+	
+	The lambda function we created
+		detects the video language
+		to see if the translation requested is already stored
+		and if not,
+		calls a translate_text method with
+			transcription text,
+			source language,
+			and target language parameters.	
 
 
+Slide 8: 	PROJECT
 
+	Our project was scrum-based...
+	We had weekly sprints
+	A daily scrum at eleven a.m. with Skillshare representative.
+	and Sprint reviews on Fridays
+
+	
+	In addition we had Mandatory rules for the team
+			Daily meeting with the Client
+			Two internal daily meetings:
+				To share individual research
+				and to do pair programming
+		and a team approval for each new code was mandatory also.
+
+	Our timeline was of six weeks
+
+
+Slide 9:	CHALLENGE
+
+	Our main challenge was achitecture definition
+	
+	This was because we had several options, and to select the optimal one we had to investigate technical detail about how Skillshare is working right now.
+
+	
+
+Slide 10: 	LESSONS
+
+	There was a lot of learning lessons for the team,
+	
+	However we want to say for sure than now we feel
+	we are capable to learn what we need.
+
+
+Slide 11:	PAGES
+
+	Finnaly, I want to show you our landing page for the project.
+
+	OPEN LANDING PAGE
+
+	Here you will find 
 
 
 Slide 12
 	Thanks to ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
