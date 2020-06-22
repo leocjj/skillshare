@@ -2,7 +2,7 @@ from boto3 import client
 from json import dumps
 from os import environ
 
-'''    
+'''
 Coding notes:
 1) If the source language is the same target language, a JSON is also stored
     using the original transcription text.
@@ -10,7 +10,7 @@ Coding notes:
     transcription must be split in case its size is bigger.
     https://docs.aws.amazon.com/translate/latest/dg/what-is-limits.html
 3) Best practices for working with AWS Lambda functions
-        https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html
+    https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html
 4) Lambda, API Gateway and Bucket must be in the same server.
 4) Functionalities:
     *) Detects if transcription (key) exists in Bucket. If not, returns 400
@@ -35,25 +35,33 @@ https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/trans
 https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/comprehend.html
 '''
 
-s3Client = client('s3')
-comprehendClient = client('comprehend')
-translateClient = client('translate')
+s3_client = client('s3')
+comprehend_client = client('comprehend')
+translate_client = client('translate')
 
 # bucket declared as environmental variable.
-bucket = environ['bucket']
-# 5000, maximum of bytes for AWS translate_text, step=4990 for unicode-8 sources
+bucket = environ.get('bucket')
+# 5000, maximum of bytes for AWS translate_text, step=4990 for unicode-8 source
 step = 4990
 # Threshold to accept an identified language match [0...1]
-languageThreshold = 0.6
+lan_threshold = 0.6
 # Response dictionary
-resp = {    'statusCode': 200,
-            'headers': {'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*',
-                        'targetKey': ''
-                        },
-            'body': dumps([])
-        }
-# languagesList = ["af","am","ar","as","az","ba","be","bn","bs","bg","ca","ceb","cs","cv","cy","da","de","el","en","eo","et","eu","fa","fi","fr","gd","ga","gl","gu","ht","he","hi","hr","hu","hy","ilo","id","is","it","jv","ja","kn","ka","kk","km","ky","ko","ku","la","lv","lt","lb","ml","mr","mk","mg","mn","ms","my","ne","new","nl","no","or","pa","pl","pt","ps","qu","ro","ru","sa","si","sk","sl","sd","so","es","sq","sr","su","sw","sv","ta","tt","te","tg","tl","th","tk","tr","ug","uk","ur","uz","vi","yi","yo","zh","zh-TW"]
+resp = {'statusCode': 200,
+        'headers': {'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'targetKey': ''},
+        'body': dumps([])}
+'''
+languages_list = ["af","am","ar","as","az","ba","be","bn","bs","bg","ca","ceb",
+                 "cs","cv","cy","da","de","el","en","eo","et","eu","fa","fi",
+                 "fr","gd","ga","gl","gu","ht","he","hi","hr","hu","hy","ilo",
+                 "id","is","it","jv","ja","kn","ka","kk","km","ky","ko","ku",
+                 "la","lv","lt","lb","ml","mr","mk","mg","mn","ms","my","ne",
+                 "new","nl","no","or","pa","pl","pt","ps","qu","ro","ru","sa",
+                 "si","sk","sl","sd","so","es","sq","sr","su","sw","sv","ta",
+                 "tt","te","tg","tl","th","tk","tr","ug","uk","ur","uz","vi",
+                 "yi","yo","zh","zh-TW"]
+'''
 
 
 def lambda_handler(event, context):
@@ -62,119 +70,124 @@ def lambda_handler(event, context):
     parameters inside an array to get a translation.
     event: array to receive parameters from API
     event['queryStringParameters']['TargetLang']: Target language for translate
-    event['queryStringParameters']['Bucketkey']: s3 key object with transcription
+    event['queryStringParameters']['Bucketkey']: s3 object with transcription
     '''
-    key = event['queryStringParameters']['Bucketkey']
-    targetLang = event['queryStringParameters']['TargetLang']
-    return lambdaFunction(key, targetLang)
+    key = event.get('queryStringParameters').get('Bucketkey')
+    target_lang = event.get('queryStringParameters').get('TargetLang')
+    return lambda_function(key, target_lang)
 
 
-def lambdaFunction(key, targetLang):
-    resp['headers']['targetKey'] = key[:key.rfind('.')] + '_' + targetLang + '.srt'
-
+def lambda_function(key, target_lang):
+    resp['headers']['targetKey'] = key[:key.rfind('.')] + '_' + target_lang + \
+                                    '.srt'
 
     ''' IF ORIGINAL TRANSCRIPTION STORED IN S3 IS NOT FOUND, RETURN 40X '''
-    if not keyExist(key):
+    if not key_exist(key):
         resp['body'] = dumps('Video transcription not found')
         return resp
 
     '''GET STORED TRANSLATION, IF NOT, TRANSLATE TRANSCRIPTION AND STORE IT'''
-    if keyExist(resp['headers']['targetKey']):
-        translationFile = s3Client.get_object(Bucket=bucket, Key=resp['headers']['targetKey'])
-        resp['body'] = translationFile['Body'].read().decode("utf-8")
+    if key_exist(resp.get('headers').get('targetKey')):
+        translation_file = s3_client.get_object(
+            Bucket=bucket,
+            Key=resp.get('headers').get('targetKey'))
+        resp['body'] = translation_file['Body'].read().decode("utf-8")
         resp['statusCode'] = 200  # Ok
         return resp
     else:
         # To get S3 object with original transcription
-        response = s3Client.get_object(Bucket=bucket, Key=key)
-        text = str(response['Body'].read().decode('utf-8'))
-    
+        response = s3_client.get_object(Bucket=bucket, Key=key)
+        text = str(response.get('Body').read().decode('utf-8'))
+
         # Detect source language by sending first 100 characters to check
-        responseLanguage = comprehendClient.detect_dominant_language(Text=text[:100])
-        if responseLanguage['Languages'][0]['Score'] <= languageThreshold:
+        response_language = comprehend_client.detect_dominant_language(
+            Text=text[:100])
+        if response_language.get('Languages')[0].get('Score') <= lan_threshold:
             resp['statusCode'] = 412    # Precondition Failed
             resp['body'] = dumps('Video language not soported')
             return resp
-        sourceLang = responseLanguage['Languages'][0]['LanguageCode']
+        source_lang = response_language.get('Languages')[0].get('LanguageCode')
 
         # Translate text if target language is not the source languaje
-        if targetLang != sourceLang:
-            text = translateBatches(sourceLang, targetLang, text)
+        if target_lang != source_lang:
+            text = translate_batches(source_lang, target_lang, text)
         if not text:
             resp['body'] = dumps('Translation was not possible')
             return resp
-    
-        # Convert translated text into a list of dictionaries for every sentense
-        listTranslated = []
+
+        # Convert translated text into a list of dicts for every sentense
+        list_translated = []
         for i in text.split('\n\n'):
             phrase = i.split('\n')
-            listTranslated.append({ 'index': phrase[0],
+            list_translated.append({'index': phrase[0],
                                     'start': phrase[1][:8],
-                                    'content': phrase[2]
-                                })
-        
-        ########## ALWAYS ACTIVATE THIS IN PRODUCTION ##########
-        ##### Store translation in a S3 object for future requests #####
-        s3Client.put_object(    Bucket = bucket,
-                                Key = resp['headers']['targetKey'],
-                                Body = dumps(listTranslated),
-                                Metadata = {'lang':targetLang,
-                                            'src_trscpt_file':key
-                                            }
-                            )
-    
+                                    'content': phrase[2]})
+
+        # ######### ALWAYS ACTIVATE THIS IN PRODUCTION ##########
+        # #### Store translation in a S3 object for future requests #####
+
+        s3_client.put_object(Bucket=bucket,
+                             Key=resp.get('headers').get('targetKey'),
+                             Body=dumps(list_translated),
+                             Metadata={'lang': target_lang,
+                                       'src_trscpt_file': key})
+
         resp['statusCode'] = 200    # Ok
-        resp['body'] = dumps(listTranslated)
+        resp['body'] = dumps(list_translated)
         return resp
 
 
-def translateBatches(sourceLang, targetLang, text):
-    ''' Translate text in batches of step size but with cutting rows of file '''
+def translate_batches(source_lang, target_lang, text):
+    ''' Translate text in batches of step size without cutting rows of file'''
     lenn = len(text)
     if lenn <= step:
         try:
-            translatedText = translateClient.translate_text(Text=text, SourceLanguageCode=sourceLang, TargetLanguageCode=targetLang)
-        except translateClient.exceptions.ClientError as e:
-            if e.response['Error']['Code'] == "500":
-                resp['statusCode'] = 500   # Internal error
+            translated_text = translate_client.translate_text(
+                Text=text,
+                SourceLanguageCode=source_lang,
+                TargetLanguageCode=target_lang)
+        except translate_client.exceptions.ClientError:
+            # if e.response['Error']['Code'] == "500":
+            resp['statusCode'] = 500   # Internal error
             return None
-        return translatedText.get('TranslatedText')
+        return translated_text.get('TranslatedText')
     else:
-        srtTemp = ''
-        indexLow = 0
-        indexHigh = text.rfind('\n\n', 0, step)
-        while(indexHigh < lenn and indexHigh != -1):
+        srt_temp = ''
+        index_low = 0
+        index_high = text.rfind('\n\n', 0, step)
+        while(index_high < lenn and index_high != -1):
             try:
-                translatedText = translateClient.translate_text(Text=text[indexLow:indexHigh], SourceLanguageCode=sourceLang, TargetLanguageCode=targetLang)
-            except translateClient.exceptions.ClientError as e:
-                if e.response['Error']['Code'] == "500":
-                    resp['statusCode'] = 500   # Internal error
-                return None
-            srtTemp += translatedText.get('TranslatedText') + '\n\n'
-            indexLow = indexHigh + 2
-            indexHigh = text.rfind('\n\n', indexLow , indexLow + step)
-        try:
-            translatedText = translateClient.translate_text(Text=text[indexLow:lenn], SourceLanguageCode=sourceLang, TargetLanguageCode=targetLang)
-        except translateClient.exceptions.ClientError as e:
-            if e.response['Error']['Code'] == "500":
+                translated_text = translate_client.translate_text(
+                    Text=text[index_low:index_high],
+                    SourceLanguageCode=source_lang,
+                    TargetLanguageCode=target_lang)
+            except translate_client.exceptions.ClientError:
+                # if e.response['Error']['Code'] == "500":
                 resp['statusCode'] = 500   # Internal error
+                return None
+            srt_temp += translated_text.get('TranslatedText') + '\n\n'
+            index_low = index_high + 2
+            index_high = text.rfind('\n\n', index_low, index_low + step)
+        try:
+            translated_text = translate_client.translate_text(
+                Text=text[index_low:lenn],
+                SourceLanguageCode=source_lang,
+                TargetLanguageCode=target_lang)
+        except translate_client.exceptions.ClientError:
+            # if e.response['Error']['Code'] == "500":
+            resp['statusCode'] = 500   # Internal error
             return None
-        srtTemp += translatedText.get('TranslatedText')
-        return srtTemp
+        srt_temp += translated_text.get('TranslatedText')
+        return srt_temp
 
 
-def keyExist(s3Key):
+def key_exist(s3_key):
     ''' TRY TO FIND IF S3 KEY EXIST '''
     try:
-        s3Client.head_object(Bucket=bucket, Key=s3Key)
-    except s3Client.exceptions.ClientError as e:
-        if e.response['Error']['Code'] == "404":
+        s3_client.head_object(Bucket=bucket, Key=s3_key)
+    except s3_client.exceptions.ClientError as e:
+        if e.response.get('Error').get('Code') == "404":
             resp['statusCode'] = 404   # Not found
         return False
-    # except Exception as ee:
-    #    return False
     else:
         return True
-    #finally:
-    #    resp['statusCode'] = 400  # Bad request
-    #    return False
