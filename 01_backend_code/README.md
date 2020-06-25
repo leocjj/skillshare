@@ -45,9 +45,13 @@ This function is called from an API Gateway (translate-API), receive three param
     * Returns 500 in case any error occurs during the translate/store task.
 
 https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#S3.Client.head_object
+
 https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#S3.Client.get_object
+
 https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/translate.html
+
 https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/translate.html#Translate.Client.start_text_translation_job
+
 https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/comprehend.html
 
 
