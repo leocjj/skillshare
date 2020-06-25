@@ -65,25 +65,6 @@ resp = {    'statusCode': 200,
 ```
 
 
-## Testing
-
-...
-
-## Flowchart
-
-...
-
-## Getting Started
-
-...
-
-
-## Examples
-
-```
-...
-```
-
 ## Built With
 
 * AWS console
