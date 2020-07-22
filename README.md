@@ -17,11 +17,6 @@ We already support transcript in English for all our Original classes, we are lo
 
 - [Back-ups](99_backups/)
 
-## Architecture
-
-
-## Mockups
-
 
 
 ## Authors
