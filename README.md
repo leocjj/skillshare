@@ -11,7 +11,7 @@ We already support transcript in English for all our Original classes, we are lo
 
 - [Back-End](01_backend_code/)
 
-- [API Gateway](02_api_code/)
+- [API Gateway](04_apigw/)
 
 - [Front-End](03_frontend_code/)
 
