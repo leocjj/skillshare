@@ -1,0 +1,171 @@
+
+Abrir:
+	slides.google.com
+		abrir presentación
+		abrir MVP				--> Alinear vertical
+		abrir API test			--> probar
+
+Presentación:
+	Dejar presentación al inicio
+	probar pantalla completa, cerrar
+
+Zoom
+	abrir zoom
+
+TURNO
+	COLOCAR CÁMARA	Y SONIDO
+	Thank you everyone...
+
+Slide 1:
+
+	Now, we are going to present to you the project AUTOMATIC TRANSLATION.
+
+Slide 2:	TEAM
+
+	This is our team...
+
+	Carlos was in charge of the frontend and design
+	Ivan was in charge of frontend and testing
+	And myself, Leonardo in the backend
+
+	A lite about me...
+	I'm a software developer with experience as a project manager
+	STEM professor, i have a master degree in maths
+
+	With a main interest in high-level language applications with a
+	focus on future development in data science and machine learning
+
+	In this project I focused on the algorithm to translate transcriptions,
+	storage and recovery of this translations.
+
+
+Slide 3:
+
+	Here we have the Main objectives for this project. 
+
+	Skillshare needs to go beyond English spoken users
+	but most of the videos and transcriptions are in English
+
+	To extend its target
+	yuo need online translations for video transcriptions
+	
+	and this process needs to be automatic 
+	without affecting user experience.
+
+	what we did was to bring an automatic service
+	to translate the transcriptions of a video the user is viewing.
+
+
+Slide 4:
+
+	Our solution brings what you need right now.
+	You will see how a video is shown with a transcription in English,
+	then the user can select a different language
+	and easily can follow the lesson by reading translated transcription online.
+
+	The architecture for this PROJECT uses AWS services including
+		A.P.I. Gateway
+		Lambda function using Python
+		S3 objects for storage
+		Translate service
+		AND
+		Comprehend service to determine the source language
+
+	Only the first time a user selects a language for a specific video,
+		translation occurs and it is stored for future users.
+
+	This way the resources used are minimum	and the process is automatic,
+	without the need of somebody who runs a translation process
+	each time a new video arrives.
+
+
+Slide 5:	lambda
+	
+	The lambda function created have several features:
+		first, detects the video language by using comprehend service on transcription
+			and checks if the translation requested is already stored
+			if it is, lambda send a JSON response with the translation.
+
+		and if not,
+		calls a translate_text method with
+			transcription text,
+			source language,
+			and target language   as parameters.
+
+		After this process,
+			the translation in JSON format is stored in a S3 object for futures requests
+
+
+						Slide 6:	API
+
+							The A.P.I was an A.P.I Rest,
+							we used a get method to make the request
+							and then the A.P.I calls for the lambda function
+3102098311
+
+Slide 8: 	PROJECT
+
+	Our project was scrum-based...
+	We had weekly sprints
+	A daily scrum at eleven a.m. with Skillshare representative.
+	and Sprint reviews on Fridays
+
+	
+	In addition we had Mandatory rules for the team
+			Daily meeting with Skillshare
+			Two internal daily meetings:
+				one to share individual research
+				and another to do pair programming
+		Also it was mandatory that a team approval for each new code was mandatory also.
+
+	Our timeline was of six weeks
+
+
+Slide 9:	CHALLENGE
+
+	Our main challenge was achitecture definition
+	
+	This was because we had several options, and to select the optimal one we had to investigate technical detail about how Skillshare is working right now.
+
+	
+
+Slide 10: 	LESSONS
+
+	There was a lot of learning lessons for the team,
+	
+	However we want to say for sure than now we feel
+	we are capable to learn what we need.
+
+
+Slide 11:	PAGES
+
+	Finnaly, I want to show you our landing page for the project.
+
+	OPEN LANDING PAGE
+
+	Here you will find 
+
+
+Slide 12
+	Thanks to ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
